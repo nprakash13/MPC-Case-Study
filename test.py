@@ -1,3 +1,5 @@
+###Creating the model
+
 import numpy as np
 
 # Add do_mpc to path. This is not necessary if it was installed via pip.
@@ -7,6 +9,8 @@ sys.path.append('../../')
 # Import do_mpc package:
 import do_mpc
 model_type = 'continuous' # either 'discrete' or 'continuous'
+
+##Model variables
 model = do_mpc.model.Model(model_type)
 
 phi_1 = model.set_variable(var_type='_x', var_name='phi_1', shape=(1,1))
@@ -23,6 +27,9 @@ phi_2_m = model.set_variable(var_type='_x', var_name='phi_2_m', shape=(1,1))
 
 print('phi_1={}, with phi_1.shape={}'.format(phi_1, phi_1.shape))
 print('dphi={}, with dphi.shape={}'.format(dphi, dphi.shape))
+
+##Query variable
+
 model.x
 
 model.x['phi_1']
@@ -32,6 +39,8 @@ model.x['dphi',0]
 
 model.x.labels()
 
+##Model parameters
+
 # As shown in the table above, we can use Long names or short names for the variable type.
 Theta_1 = model.set_variable('parameter', 'Theta_1')
 Theta_2 = model.set_variable('parameter', 'Theta_2')
@@ -39,6 +48,9 @@ Theta_3 = model.set_variable('parameter', 'Theta_3')
 
 c = np.array([2.697,  2.66,  3.05, 2.86])*1e-3
 d = np.array([6.78,  8.01,  8.82])*1e-5
+
+
+##Right-hand-side equation
 
 model.set_rhs('phi_1', dphi[0])
 model.set_rhs('phi_2', dphi[1])
@@ -58,7 +70,13 @@ tau = 1e-2
 model.set_rhs('phi_1_m', 1/tau*(phi_m_1_set - phi_1_m))
 model.set_rhs('phi_2_m', 1/tau*(phi_m_2_set - phi_2_m))
 model.setup()
+
+###Configurating MPC controller
+
 mpc = do_mpc.controller.MPC(model)
+
+##Optimizer parameters
+
 setup_mpc = {
     'n_horizon': 20,
     't_step': 0.1,
@@ -66,6 +84,10 @@ setup_mpc = {
     'store_full_solution': True,
 }
 mpc.set_param(**setup_mpc)
+
+
+##Objective function
+
 mterm = phi_1**2 + phi_2**2 + phi_3**2
 lterm = phi_1**2 + phi_2**2 + phi_3**2
 
@@ -75,6 +97,8 @@ mpc.set_rterm(
     phi_m_1_set=1e-2,
     phi_m_2_set=1e-2
 )
+
+##Constrains
 
 # Lower bounds on states:
 mpc.bounds['lower','_x', 'phi_1'] = -2*np.pi
@@ -92,19 +116,17 @@ mpc.bounds['lower','_u', 'phi_m_2_set'] = -2*np.pi
 mpc.bounds['upper','_u', 'phi_m_1_set'] = 2*np.pi
 mpc.bounds['upper','_u', 'phi_m_2_set'] = 2*np.pi
 
+
+##Scaling 
+
+
 mpc.scaling['_x', 'phi_1'] = 2
 mpc.scaling['_x', 'phi_2'] = 2
 mpc.scaling['_x', 'phi_3'] = 2
 
-inertia_mass_1 = 2.25*1e-4*np.array([1., 0.9, 1.1])
-inertia_mass_2 = 2.25*1e-4*np.array([1., 0.9, 1.1])
-inertia_mass_3 = 2.25*1e-4*np.array([1.])
 
-mpc.set_uncertainty_values(
-    Theta_1 = inertia_mass_1,
-    Theta_2 = inertia_mass_2,
-    Theta_3 = inertia_mass_3
-)
+##Uncertain parameters
+
 
 inertia_mass_1 = 2.25*1e-4*np.array([1., 0.9, 1.1])
 inertia_mass_2 = 2.25*1e-4*np.array([1., 0.9, 1.1])
@@ -115,13 +137,34 @@ mpc.set_uncertainty_values(
     Theta_2 = inertia_mass_2,
     Theta_3 = inertia_mass_3
 )
+
+
+inertia_mass_1 = 2.25*1e-4*np.array([1., 0.9, 1.1])
+inertia_mass_2 = 2.25*1e-4*np.array([1., 0.9, 1.1])
+inertia_mass_3 = 2.25*1e-4*np.array([1.])
+
+mpc.set_uncertainty_values(
+    Theta_1 = inertia_mass_1,
+    Theta_2 = inertia_mass_2,
+    Theta_3 = inertia_mass_3
+)
+
+##Setup
 
 mpc.setup()
+
+### Configurating the simulator
 
 simulator = do_mpc.simulator.Simulator(model)
 # Instead of supplying a dict with the splat operator (**), as with the optimizer.set_param(),
 # we can also use keywords (and call the method multiple times, if necessary):
+
+##Simulator parameters
+
 simulator.set_param(t_step = 0.1)
+
+##Uncertain parameters
+
 p_template = simulator.get_p_template()
 type(p_template)
 p_template.keys()
@@ -132,7 +175,12 @@ def p_fun(t_now):
     return p_template
     
 simulator.set_p_fun(p_fun)
+
+## Setup
 simulator.setup()
+
+### Creating the control loop
+
 x0 = np.pi*np.array([1, 1, -1.5, 1, -1, 1, 0, 0]).reshape(-1,1)
 simulator.x0 = x0
 mpc.x0 = x0
@@ -141,7 +189,7 @@ mpc.x0['phi_1']
 mpc.set_initial_guess()
 
 
-
+## Setting up the graphics
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 # Customizing Matplotlib:
@@ -173,7 +221,7 @@ ax[0].set_ylabel('angle position [rad]')
 ax[1].set_ylabel('motor angle [rad]')
 ax[1].set_xlabel('time [s]')
 
-
+## Running the simulator
 u0 = np.zeros((2,1))
 for i in range(200):
     simulator.make_step(u0)
@@ -185,7 +233,7 @@ sim_graphics.reset_axes()
 # Show the figure:
 fig
 
-
+## Running the optimizer   
 u0 = mpc.make_step(x0)
 
 sim_graphics.clear()
