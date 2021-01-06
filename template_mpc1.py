@@ -61,14 +61,14 @@ def template_mpc1(model1):
     lterm = model1._x['L']
 
     mpc.set_objective(mterm=mterm, lterm=mterm)
-    mpc.set_rterm('F_out = 1')
+    mpc.set_rterm(F_out = 1)
 
 
     #mpc.bounds['lower', '_x', 'X_s'] = 0.0
     #mpc.bounds['lower', '_x', 'S_s'] = -0.01
     #mpc.bounds['lower', '_x', 'P_s'] = 0.0
     #mpc.bounds['lower', '_x', 'V_s'] = 0.0
-    mpc.bounds['lower', '_x', 'L'] = 80.0
+    mpc.bounds['upper', '_x', 'L'] = 80.0
 
     #mpc.bounds['upper', '_x','X_s'] = 3.7
     #mpc.bounds['upper', '_x','P_s'] = 3.0

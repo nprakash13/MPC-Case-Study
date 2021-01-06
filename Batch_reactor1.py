@@ -33,7 +33,7 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import time
 
-from template_model1 import template_model1
+from template_model_1 import *
 from template_mpc1 import template_mpc1
 from template_simulator1 import template_simulator1
 
