@@ -46,9 +46,9 @@ def template_mpc1(model1):
         'collocation_type': 'radau',
         'collocation_deg': 2,
         'collocation_ni': 2,
-        'store_full_solution': True,
+        'store_full_solution': True
         # Use MA27 linear solver in ipopt for faster calculations:
-        'nlpsol_opts': {'ipopt.linear_solver': 'MA27'}
+        #'nlpsol_opts': {'ipopt.linear_solver': 'MA27'}
     }
 
     mpc.set_param(**setup_mpc)
@@ -57,11 +57,11 @@ def template_mpc1(model1):
     # lterm = -model.x['P_s']
     #mterm = -model1.x('F_out',)
     #lterm = -model1.x('F_out',)
-    mterm = -model1._x['L']
-    lterm = -model1._x['L']
+    mterm = -(2.5*model1._x['L'])
+    lterm = -(2.5*model1._x['L'])
 
     mpc.set_objective(mterm=mterm, lterm=mterm)
-    mpc.set_rterm(F_out = 1.0)
+    mpc.set_rterm(F_out = 1)
 
 
     #mpc.bounds['lower', '_x', 'X_s'] = 0.0
@@ -75,12 +75,16 @@ def template_mpc1(model1):
     mpc.bounds['lower', '_x', 'L'] = 20.0
     mpc.bounds['upper', '_x', 'L'] = 80.0
 
+    #mpc.bounds['lower', '_x', 'F_in'] = 0.0
+    #mpc.bounds['upper', '_x', 'F_in'] = 40.0
+
     #mpc.bounds['lower','_u','inp'] = 0.0
     #mpc.bounds['upper','_u','inp'] = 0.2
     mpc.bounds['lower','_u','F_out'] = 0.0
     mpc.bounds['upper','_u','F_out'] = 50.0
 
-    Y_x_values = np.array([0.5, 0.4, 0.3])
+
+    Y_x_values = np.array([10])
     #S_in_values = np.array([200.0, 220.0, 180.0])
 
     mpc.set_uncertainty_values(F_in = Y_x_values)

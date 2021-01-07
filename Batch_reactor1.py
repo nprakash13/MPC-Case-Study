@@ -60,10 +60,11 @@ Set initial state
 #V_s_0 = 120.0 #[C]
 #x0 = np.array([X_s_0, S_s_0, P_s_0, V_s_0])
 
-L = 0
+L = 50
 #F_in = 10
 #F_out = 0
 x0 = np.array([L])
+
 
 mpc.x0 = x0
 simulator.x0 = x0
@@ -82,7 +83,7 @@ plt.ion()
 Run MPC main loop:
 """
 
-for k in range(150):
+for k in range(100):
     u0 = mpc.make_step(x0)
     y_next = simulator.make_step(u0)
     x0 = estimator.make_step(y_next)
