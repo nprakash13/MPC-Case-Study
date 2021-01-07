@@ -61,9 +61,9 @@ Set initial state
 #x0 = np.array([X_s_0, S_s_0, P_s_0, V_s_0])
 
 L = 0
-F_in = 10
-F_out = 0
-x0 = np.array([L, F_in, F_out])
+#F_in = 10
+#F_out = 0
+x0 = np.array([L])
 
 mpc.x0 = x0
 simulator.x0 = x0

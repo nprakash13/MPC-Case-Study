@@ -47,8 +47,8 @@ def template_simulator1(model1):
     simulator.set_param(**params_simulator)
 
     p_num = simulator.get_p_template()
-    p_num['Y_x'] = 0.5
-    p_num['S_in'] = 200.0
+    p_num['F_in'] = 1
+    #p_num['S_in'] = 200.0
 
     def p_fun(t_now):
         return p_num

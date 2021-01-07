@@ -57,32 +57,33 @@ def template_mpc1(model1):
     # lterm = -model.x['P_s']
     #mterm = -model1.x('F_out',)
     #lterm = -model1.x('F_out',)
-    mterm = model1._x['L']
-    lterm = model1._x['L']
+    mterm = -model1._x['L']
+    lterm = -model1._x['L']
 
     mpc.set_objective(mterm=mterm, lterm=mterm)
-    mpc.set_rterm('F_out = 1')
+    mpc.set_rterm(F_out = 1.0)
 
 
     #mpc.bounds['lower', '_x', 'X_s'] = 0.0
     #mpc.bounds['lower', '_x', 'S_s'] = -0.01
     #mpc.bounds['lower', '_x', 'P_s'] = 0.0
     #mpc.bounds['lower', '_x', 'V_s'] = 0.0
-    mpc.bounds['lower', '_x', 'L'] = 80.0
+    
 
     #mpc.bounds['upper', '_x','X_s'] = 3.7
     #mpc.bounds['upper', '_x','P_s'] = 3.0
     mpc.bounds['lower', '_x', 'L'] = 20.0
+    mpc.bounds['upper', '_x', 'L'] = 80.0
 
     #mpc.bounds['lower','_u','inp'] = 0.0
     #mpc.bounds['upper','_u','inp'] = 0.2
     mpc.bounds['lower','_u','F_out'] = 0.0
     mpc.bounds['upper','_u','F_out'] = 50.0
 
-    #Y_x_values = np.array([0.5, 0.4, 0.3])
+    Y_x_values = np.array([0.5, 0.4, 0.3])
     #S_in_values = np.array([200.0, 220.0, 180.0])
 
-    #mpc.set_uncertainty_values(Y_x = Y_x_values, S_in = S_in_values)
+    mpc.set_uncertainty_values(F_in = Y_x_values)
     #mpc.set_p_fun()
     #mpc.set_p_fun
 
