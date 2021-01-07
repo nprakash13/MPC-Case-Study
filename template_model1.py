@@ -77,7 +77,7 @@ def template_model1():
     # model.set_rhs('P_s', v_par*X_s - inp/V_s*P_s)
     # model.set_rhs('V_s', inp)
 
-    model1.set_rhs('L', 10*1/T*(F_in-F_out))
+    model1.set_rhs('L', 1/T*(F_in-F_out))
 
     # Build the model
     model1.setup()
