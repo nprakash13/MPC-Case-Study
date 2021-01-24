@@ -60,9 +60,10 @@ Set initial state
 #V_s_0 = 120.0 #[C]
 #x0 = np.array([X_s_0, S_s_0, P_s_0, V_s_0])
 
-L = 50
+L = 30
+
 #F_in = 10
-#F_out = 0
+#F_out = 20
 x0 = np.array([L])
 
 
@@ -77,13 +78,15 @@ Setup graphic:
 """
 
 fig, ax, graphics = do_mpc.graphics.default_plot(mpc.data, figsize=(8,5))
+#fig, ax, graphics = do_mpc.graphics.default_plot(mpc.data_fields, figsize=(8,5))
+
 plt.ion()
 
 """
 Run MPC main loop:
 """
 
-for k in range(100):
+for k in range(50):
     u0 = mpc.make_step(x0)
     y_next = simulator.make_step(u0)
     x0 = estimator.make_step(y_next)

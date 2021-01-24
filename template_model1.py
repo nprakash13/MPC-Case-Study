@@ -45,7 +45,7 @@ def template_model1():
     # v_par = 0.004
     # Y_p	  = 1.2
 
-    T = 60 
+    T = 1
 
     # States struct (optimization variables):
     # X_s = model.set_variable('_x',  'X_s')  # bio mass
@@ -56,11 +56,13 @@ def template_model1():
     L = model1.set_variable('_x', 'L') # Level of tank
     #F_in = model1.set_variable('_x', 'F_in') # Inlet flow (FC10)  
     
-
+    
     # Input struct (optimization variables):
     # inp = model.set_variable('_u',  'inp')
-    F_out = model1.set_variable('_u', 'F_out') # Output flow (FC25)
-     
+    #F_out_set = model1.set_variable('_u', 'F_out_set') # Output flow (FC25)
+    #L_set = model1.set_variable('_u', 'L_set') # Output flow (FC25) 
+    F_out = model1.set_variable('_u', 'F_out') # Level of tank
+
     # Fixed parameters:
     # Y_x = model.set_variable('_p',  'Y_x')
     # S_in = model.set_variable('_p', 'S_in')
@@ -78,7 +80,8 @@ def template_model1():
     # model.set_rhs('V_s', inp)
 
     #model1.set_rhs('L', 1/T*(F_in-F_out))
-    model1.set_rhs('L', 10*1/T*(20-F_out))
+    model1.set_rhs('L', 1/T*(20-F_out))
+    #model1.set_rhs('F_out', (F_in-F_out))
     #model1.set_rhs('L', F_in )
     # Build the model
     model1.setup()
